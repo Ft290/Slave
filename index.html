@@ -7,12 +7,23 @@
 </head>
 <body>
     <h1>Slave Page</h1>
-    <div id="messages"></div>
+    <div id="messages">Loading messages...</div>
 
     <script>
-        function loadMessages() {
-            // localStorage'dan mesajları al
-            const messages = JSON.parse(localStorage.getItem('messages')) || [];
+        const REPO_OWNER = 'YOUR_USERNAME'; // Buraya GitHub kullanıcı adınızı girin
+        const REPO_NAME = 'YOUR_REPO_NAME'; // Buraya deponuzun adını girin
+        const FILE_PATH = 'messages.json'; // Okunacak dosyanın yolu
+
+        async function loadMessages() {
+            const apiUrl = `https://raw.githubusercontent.com/${REPO_OWNER}/${REPO_NAME}/main/${FILE_PATH}`;
+
+            const response = await fetch(apiUrl);
+            if (!response.ok) {
+                document.getElementById('messages').innerText = 'Error loading messages.';
+                return;
+            }
+
+            const messages = await response.json();
             const messageDisplay = document.getElementById('messages');
             messageDisplay.innerHTML = messages.map(msg => `<p>${msg}</p>`).join('');
         }
