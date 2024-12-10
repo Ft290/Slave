@@ -7,35 +7,18 @@
 </head>
 <body>
     <h1>Slave Page</h1>
-    <div id="messageDisplay">No messages yet.</div>
+    <div id="messages"></div>
 
     <script>
-        const socket = new WebSocket('ws://localhost:8080');
+        function loadMessages() {
+            // localStorage'dan mesajları al
+            const messages = JSON.parse(localStorage.getItem('messages')) || [];
+            const messageDisplay = document.getElementById('messages');
+            messageDisplay.innerHTML = messages.map(msg => `<p>${msg}</p>`).join('');
+        }
 
-        socket.addEventListener('open', () => {
-            console.log('Connected to WebSocket server.');
-        });
-
-        socket.addEventListener('message', (event) => {
-            // Gelen mesajın Blob olarak geldiğini varsayarak, bunu text'e dönüştürün.
-            if (event.data instanceof Blob) {
-                const reader = new FileReader();
-                reader.onload = () => {
-                    const message = reader.result; // Dönüştürülmüş mesaj
-                    console.log('Message received:', message);
-                    document.getElementById('messageDisplay').innerText = message;
-                };
-                reader.readAsText(event.data); // Blob'u text olarak oku
-            } else {
-                // Eğer mesaj doğrudan text formatında ise (Blob değilse)
-                console.log('Message received:', event.data);
-                document.getElementById('messageDisplay').innerText = event.data;
-            }
-        });
-
-        socket.addEventListener('close', () => {
-            console.log('WebSocket connection closed.');
-        });
+        // Sayfa yüklendiğinde mesajları yükle
+        window.onload = loadMessages;
     </script>
 </body>
 </html>
